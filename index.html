@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ollie's Dice - Pokemon Vending</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600;700&family=Kalam:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo-container">
+                <img src="assets/images/logo.jpg" alt="Ollie's Dice Logo" class="logo">
+                <span class="logo-text">Ollie's Dice</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#home" class="nav-link active">Home</a></li>
+                <li><a href="#schedule" class="nav-link">Schedule</a></li>
+                <li><a href="#inventory" class="nav-link">Inventory</a></li>
+                <li><a href="#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <button class="menu-toggle" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <!-- DICE Blocks -->
+        <div class="dice-container">
+            <div class="dice-block dice-d">
+                <span class="dice-letter">D</span>
+            </div>
+            <div class="dice-block dice-i">
+                <span class="dice-letter">I</span>
+            </div>
+            <div class="dice-block dice-c">
+                <span class="dice-letter">C</span>
+            </div>
+            <div class="dice-block dice-e">
+                <span class="dice-letter">E</span>
+            </div>
+        </div>
+        
+        <div class="hero-content">
+            <h1 class="hero-title">Purr-fect Pulls & Cozy Vibes</h1>
+            <p class="hero-subtitle">Your friendly neighborhood vending booth for Pokémon TCG, custom dice, and collectibles. Find the cat at the next NYC con! 🐈</p>
+            
+            <div class="cta-buttons">
+                <a href="#schedule" class="cta-button cta-primary">
+                    <span class="cta-icon">📅</span>
+                    Find Our Booth
+                </a>
+                <a href="#inventory" class="cta-button cta-secondary">
+                    <span class="cta-icon">📦</span>
+                    Browse Cards
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Show Schedule Section -->
+    <section id="schedule" class="section">
+        <!-- Cat Yawn Video -->
+        <div class="cat-video-container">
+            <video class="cat-yawn-video" autoplay loop muted playsinline>
+                <source src="assets/videos/cat_yawn.mp4" type="video/mp4">
+            </video>
+        </div>
+        
+        <div class="container">
+            <h2 class="section-title">Show Schedule</h2>
+            <p class="section-description">Find us at these upcoming events!</p>
+            <div class="schedule-grid" id="scheduleGrid">
+                <!-- Schedule items will be populated by JavaScript -->
+                <div class="schedule-item">
+                    <div class="schedule-date">
+                        <span class="date-day">15</span>
+                        <span class="date-month">MAR</span>
+                    </div>
+                    <div class="schedule-details">
+                        <h3>Pokemon Card Show - Downtown</h3>
+                        <p class="schedule-location">📍 Convention Center, Main Hall</p>
+                        <p class="schedule-time">🕐 10:00 AM - 6:00 PM</p>
+                    </div>
+                </div>
+                <div class="schedule-item">
+                    <div class="schedule-date">
+                        <span class="date-day">22</span>
+                        <span class="date-month">MAR</span>
+                    </div>
+                    <div class="schedule-details">
+                        <h3>Gaming Expo 2024</h3>
+                        <p class="schedule-location">📍 Expo Center, Booth 42</p>
+                        <p class="schedule-time">🕐 9:00 AM - 8:00 PM</p>
+                    </div>
+                </div>
+                <div class="schedule-item">
+                    <div class="schedule-date">
+                        <span class="date-day">05</span>
+                        <span class="date-month">APR</span>
+                    </div>
+                    <div class="schedule-details">
+                        <h3>Community Market Day</h3>
+                        <p class="schedule-location">📍 City Park, Vendor Row</p>
+                        <p class="schedule-time">🕐 11:00 AM - 5:00 PM</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Inventory Section -->
+    <section id="inventory" class="section section-alt">
+        <div class="container">
+            <h2 class="section-title">Our Inventory</h2>
+            <p class="section-description">Browse our collection of Pokemon cards and products</p>
+            <div class="inventory-search-container">
+                <input type="text" id="inventorySearch" class="inventory-search" placeholder="Search inventory...">
+            </div>
+            <div class="inventory-filters">
+                <button class="filter-btn active" data-filter="all">All Items</button>
+                <button class="filter-btn" data-filter="raw">Raw Cards</button>
+                <button class="filter-btn" data-filter="psa">PSA Slabs</button>
+                <button class="filter-btn" data-filter="sealed">Sealed Items</button>
+            </div>
+            <div class="inventory-grid" id="inventoryGrid">
+                <!-- Inventory items will be loaded from Google Sheets -->
+            </div>
+            <div class="load-more-container" id="loadMoreContainer" style="display: none;">
+                <button class="load-more-btn" id="loadMoreBtn">Load More</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Instagram Feed Section -->
+    <section id="instagram" class="section">
+        <div class="container">
+            <h2 class="section-title">Follow Us on Instagram</h2>
+            <p class="section-description">Check out our latest posts and updates!</p>
+            <div class="instagram-feed" id="instagramFeed">
+                <!-- Instagram posts will be loaded here -->
+                <div class="instagram-placeholder">
+                    <p>📸 Loading Instagram feed...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="section section-alt">
+        <div class="container">
+            <h2 class="section-title">Get in Touch</h2>
+            <p class="section-description">Have questions? Want to book us for an event? Reach out!</p>
+            <div class="contact-grid">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <h3>📧 Email</h3>
+                        <a href="mailto:info@olliesdice.com">info@olliesdice.com</a>
+                    </div>
+                    <div class="contact-item">
+                        <h3>📸 Instagram</h3>
+                        <a href="https://instagram.com/ollies.dice" target="_blank">@ollies.dice</a>
+                    </div>
+                </div>
+                <form class="contact-form" id="contactForm">
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Message</label>
+                        <textarea id="message" name="message" rows="5" required></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="assets/images/logo.jpg" alt="Ollie's Dice Logo" class="footer-logo-img">
+                </div>
+                <div class="footer-links">
+                    <a href="#home">Home</a>
+                    <a href="#schedule">Schedule</a>
+                    <a href="#inventory">Inventory</a>
+                    <a href="#instagram">Instagram</a>
+                    <a href="#contact">Contact</a>
+                </div>
+                <div class="footer-social">
+                    <a href="https://instagram.com/ollies.dice" target="_blank" class="social-link">📸 Instagram</a>
+                </div>
+            </div>
+            <p class="footer-copyright">&copy; 2024 Ollie's Dice. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="assets/js/script.js"></script>
+</body>
+</html>
+
