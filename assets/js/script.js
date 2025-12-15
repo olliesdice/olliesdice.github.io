@@ -341,15 +341,23 @@ function renderInventory(filter = 'all', searchTerm = '', resetCount = true) {
 // Contact Form
 document.getElementById('contactForm').addEventListener('submit', (e) => {
     e.preventDefault();
-    const formData = {
-        name: document.getElementById('name').value,
-        email: document.getElementById('email').value,
-        message: document.getElementById('message').value
-    };
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+    const message = document.getElementById('message').value;
     
-    // In a real application, you would send this to a server
-    alert('Thank you for your message! We\'ll get back to you soon.');
-    document.getElementById('contactForm').reset();
+    // Create mailto link with form data
+    const subject = encodeURIComponent(`Contact Form Submission from ${name}`);
+    const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`);
+    const mailtoLink = `mailto:ollies.dice@gmail.com?subject=${subject}&body=${body}`;
+    
+    // Open email client
+    window.location.href = mailtoLink;
+    
+    // Reset form after a short delay
+    setTimeout(() => {
+        document.getElementById('contactForm').reset();
+        alert('Thank you for your message! Your email client should open shortly.');
+    }, 100);
 });
 
 // Instagram Feed Integration
