@@ -218,16 +218,35 @@ async function loadInventoryFromSheet(forceRefresh = false) {
             throw new Error('Invalid data format from sheet - expected array');
         }
         
+        // Helper: safely get a price/sticker value regardless of exact header casing/spacing
+        function getPriceFromRow(row) {
+            if (!row || typeof row !== 'object') return '';
+            
+            // Direct known keys first
+            if (row.Sticker) return row.Sticker;
+            if (row.sticker) return row.sticker;
+            if (row.Price) return row.Price;
+            if (row.price) return row.price;
+            
+            // Fallback: search keys case-insensitively and ignore extra spaces
+            for (const key in row) {
+                if (!Object.prototype.hasOwnProperty.call(row, key)) continue;
+                const normalized = key.trim().toLowerCase();
+                if (normalized === 'sticker' || normalized === 'price' || normalized === 'sticker price') {
+                    return row[key];
+                }
+            }
+            return '';
+        }
+
         // Convert sheet data to inventory format
         inventory = data
             .filter(row => row.name && row.category) // Filter out empty rows
             .map(row => {
-                // Prefer Sticker column, fall back to Price if needed
-                // Supports sheet headers: "Sticker", "sticker", or legacy "Price"/"price"
-                let rawSticker = row.Sticker || row.sticker || row.Price || row.price || '';
+                const rawSticker = getPriceFromRow(row);
                 
                 // Convert to string and ensure it starts with $
-                let price = String(rawSticker).trim();
+                let price = String(rawSticker || '').trim();
                 if (price && !price.startsWith('$')) {
                     price = '$' + price;
                 }
