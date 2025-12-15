@@ -362,28 +362,6 @@ function renderInventory(filter = 'all', searchTerm = '', resetCount = true) {
 // Inventory Filters (set up in DOMContentLoaded)
 
 
-// Contact Form
-document.getElementById('contactForm').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const name = document.getElementById('name').value;
-    const email = document.getElementById('email').value;
-    const message = document.getElementById('message').value;
-    
-    // Create mailto link with form data
-    const subject = encodeURIComponent(`Contact Form Submission from ${name}`);
-    const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`);
-    const mailtoLink = `mailto:ollies.dice@gmail.com?subject=${subject}&body=${body}`;
-    
-    // Open email client
-    window.location.href = mailtoLink;
-    
-    // Reset form after a short delay
-    setTimeout(() => {
-        document.getElementById('contactForm').reset();
-        alert('Thank you for your message! Your email client should open shortly.');
-    }, 100);
-});
-
 // Instagram Feed Integration
 const INSTAGRAM_USERNAME = 'ollies.dice';
 
