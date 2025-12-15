@@ -222,11 +222,16 @@ async function loadInventoryFromSheet(forceRefresh = false) {
         inventory = data
             .filter(row => row.name && row.category) // Filter out empty rows
             .map(row => {
-                // Convert price to string and ensure it starts with $
-                let price = String(row.price || '').trim();
+                // Prefer Sticker column, fall back to Price if needed
+                // Supports sheet headers: "Sticker", "sticker", or legacy "Price"/"price"
+                let rawSticker = row.Sticker || row.sticker || row.Price || row.price || '';
+                
+                // Convert to string and ensure it starts with $
+                let price = String(rawSticker).trim();
                 if (price && !price.startsWith('$')) {
                     price = '$' + price;
                 }
+                
                 return {
                     category: (row.category || '').toLowerCase(),
                     name: row.name || '',
