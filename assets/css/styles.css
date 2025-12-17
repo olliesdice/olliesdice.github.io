@@ -420,6 +420,10 @@ body::before {
     overflow: hidden;
 }
 
+#instagram.section {
+    overflow: visible;
+}
+
 .section-alt {
     background: linear-gradient(to bottom, var(--cream) 0%, var(--warm-beige) 100%);
     border-top: 6px solid var(--beige);
@@ -438,10 +442,11 @@ body::before {
         6px 6px 10px rgba(74, 55, 40, 0.3);
     letter-spacing: 1px;
     position: relative;
-    display: inline-block;
+    display: block;
     width: 100%;
     transform: rotate(-0.8deg);
 }
+
 
 .section-description {
     text-align: center;
@@ -735,6 +740,8 @@ body::before {
     justify-content: center;
     align-items: center;
     width: 100%;
+    position: relative;
+    overflow: visible;
 }
 
 .instagram-post {
@@ -742,6 +749,8 @@ body::before {
     justify-content: center;
     align-items: center;
     width: 100%;
+    position: relative;
+    z-index: 2;
 }
 
 .instagram-post iframe {
@@ -764,6 +773,8 @@ body::before {
     display: flex;
     justify-content: center;
     align-items: center;
+    position: relative;
+    z-index: 2;
 }
 
 .instagram-profile-embed iframe {
@@ -784,6 +795,22 @@ body::before {
         0 5px 0 var(--beige),
         0 10px 25px rgba(74, 55, 40, 0.15);
     transform: rotate(-0.5deg);
+    position: relative;
+    z-index: 2;
+}
+
+
+/* Cat hiding behind Instagram tile - bottom left */
+.cat-hiding-behind-tile {
+    position: absolute;
+    bottom: 5px;
+    left: 0px;
+    width: 500px;
+    height: auto;
+    z-index: 3;
+    opacity: 0.95;
+    transform: rotate(0deg);
+    pointer-events: none;
 }
 
 .instagram-placeholder p {
@@ -1103,6 +1130,7 @@ body::before {
         font-size: 2.2rem;
     }
 
+
     .schedule-item {
         flex-direction: column;
         text-align: center;
@@ -1127,6 +1155,12 @@ body::before {
 
     .inventory-grid {
         grid-template-columns: 1fr;
+    }
+
+    .cat-hiding-behind-tile {
+        width: 200px;
+        top: -30px;
+        left: -30px;
     }
 }
 
@@ -1181,5 +1215,11 @@ body::before {
 
     .section-title {
         font-size: 1.8rem;
+    }
+
+    .cat-hiding-behind-tile {
+        width: 200px;
+        bottom: -20px;
+        left: -30px;
     }
 }

@@ -378,9 +378,14 @@ const INSTAGRAM_POST_URLS = [
 async function fetchInstagramFeed() {
     const feedContainer = document.getElementById('instagramFeed');
     
+    // Preserve the cat image if it exists
+    const catImage = feedContainer.querySelector('.cat-hiding-behind-tile');
+    const catImageHTML = catImage ? catImage.outerHTML : '';
+    
     // If no post URLs configured, show placeholder
     if (!INSTAGRAM_POST_URLS || INSTAGRAM_POST_URLS.length === 0) {
         feedContainer.innerHTML = `
+            ${catImageHTML}
             <div class="instagram-placeholder">
                 <p>📸 Follow us on Instagram!</p>
                 <p class="placeholder-note">
@@ -398,7 +403,7 @@ async function fetchInstagramFeed() {
     }
     
     // Fetch embed codes for each post URL
-    feedContainer.innerHTML = '<div class="instagram-loading" style="grid-column: 1 / -1; text-align: center; padding: 4rem 2rem; color: var(--dark-brown); font-size: 1.2rem;">Loading Instagram posts...</div>';
+    feedContainer.innerHTML = `${catImageHTML}<div class="instagram-loading" style="grid-column: 1 / -1; text-align: center; padding: 4rem 2rem; color: var(--dark-brown); font-size: 1.2rem;">Loading Instagram posts...</div>`;
     
     try {
         const embedPromises = INSTAGRAM_POST_URLS.map(async (postUrl) => {
@@ -445,6 +450,7 @@ async function fetchInstagramFeed() {
         
         if (validEmbeds.length === 0) {
             feedContainer.innerHTML = `
+                ${catImageHTML}
                 <div class="instagram-placeholder">
                     <p>📸 Unable to load Instagram posts</p>
                     <p class="placeholder-note">
@@ -459,11 +465,11 @@ async function fetchInstagramFeed() {
         }
         
         // Display embedded posts
-        feedContainer.innerHTML = validEmbeds.map(embed => `
+        feedContainer.innerHTML = `${catImageHTML}${validEmbeds.map(embed => `
             <div class="instagram-post">
                 ${embed}
             </div>
-        `).join('');
+        `).join('')}`;
         
         // Load Instagram's embed script if not already loaded
         if (!document.querySelector('script[src*="instagram.com/embed.js"]')) {
@@ -480,7 +486,10 @@ async function fetchInstagramFeed() {
         
     } catch (error) {
         console.error('Error loading Instagram feed:', error);
+        const catImage = feedContainer.querySelector('.cat-hiding-behind-tile');
+        const catImageHTML = catImage ? catImage.outerHTML : '';
         feedContainer.innerHTML = `
+            ${catImageHTML}
             <div class="instagram-placeholder">
                 <p>📸 Unable to load Instagram posts</p>
                 <p class="placeholder-note">
