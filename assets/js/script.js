@@ -218,21 +218,26 @@ async function loadInventoryFromSheet(forceRefresh = false) {
             throw new Error('Invalid data format from sheet - expected array');
         }
         
-        // Helper: safely get a price/sticker value regardless of exact header casing/spacing
+        // Helper: safely get a market value/price value regardless of exact header casing/spacing
         function getPriceFromRow(row) {
             if (!row || typeof row !== 'object') return '';
             
-            // Direct known keys first
-            if (row.Sticker) return row.Sticker;
-            if (row.sticker) return row.sticker;
+            // Direct known keys first - prioritize Market Value
+            if (row['Market Value']) return row['Market Value'];
+            if (row['market value']) return row['market value'];
+            if (row.MarketValue) return row.MarketValue;
+            if (row.marketValue) return row.marketValue;
             if (row.Price) return row.Price;
             if (row.price) return row.price;
+            // Keep Sticker as fallback for backwards compatibility
+            if (row.Sticker) return row.Sticker;
+            if (row.sticker) return row.sticker;
             
             // Fallback: search keys case-insensitively and ignore extra spaces
             for (const key in row) {
                 if (!Object.prototype.hasOwnProperty.call(row, key)) continue;
                 const normalized = key.trim().toLowerCase();
-                if (normalized === 'sticker' || normalized === 'price' || normalized === 'sticker price') {
+                if (normalized === 'market value' || normalized === 'marketvalue' || normalized === 'price' || normalized === 'sticker' || normalized === 'sticker price') {
                     return row[key];
                 }
             }
