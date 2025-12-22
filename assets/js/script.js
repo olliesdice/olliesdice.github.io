@@ -91,16 +91,52 @@ async function loadSchedulesFromSheet(forceRefresh = false) {
         const response = await fetch(GOOGLE_SHEETS_CONFIG.shows);
         const data = await response.json();
         
-        // Convert sheet data to schedule format
+        // Helper function to convert month name to number (0-11)
+        function monthNameToNumber(monthName) {
+            const months = {
+                'JAN': 0, 'FEB': 1, 'MAR': 2, 'APR': 3, 'MAY': 4, 'JUN': 5,
+                'JUL': 6, 'AUG': 7, 'SEP': 8, 'OCT': 9, 'NOV': 10, 'DEC': 11
+            };
+            return months[monthName.toUpperCase()] ?? -1;
+        }
+        
+        // Helper function to check if a date is in the past
+        function isDateInPast(year, month, day) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Reset to start of day for comparison
+            
+            const scheduleDate = new Date(year, month, day);
+            
+            return scheduleDate < today;
+        }
+        
+        // Convert sheet data to schedule format and filter out past dates
         schedules = data
             .filter(row => row.day && row.title) // Filter out empty rows
-            .map(row => ({
-                day: parseInt(row.day) || row.day,
-                month: (row.month || '').toUpperCase(),
-                title: row.title || '',
-                location: row.location || '',
-                time: row.time || ''
-            }));
+            .map(row => {
+                const year = parseInt(row.year) || new Date().getFullYear(); // Default to current year if not provided
+                const month = (row.month || '').toUpperCase();
+                const day = parseInt(row.day);
+                const monthNum = monthNameToNumber(month);
+                
+                return {
+                    year: year,
+                    day: day,
+                    month: month,
+                    monthNum: monthNum,
+                    title: row.title || '',
+                    location: row.location || '',
+                    time: row.time || ''
+                };
+            })
+            .filter(schedule => {
+                // Filter out past dates
+                if (schedule.monthNum === -1) {
+                    // Invalid month, keep it (might be a special case)
+                    return true;
+                }
+                return !isDateInPast(schedule.year, schedule.monthNum, schedule.day);
+            });
         
         // Cache the data
         localStorage.setItem('cached_schedules', JSON.stringify(schedules));
@@ -142,7 +178,7 @@ function renderSchedules() {
     if (!scheduleGrid) return;
     
     if (schedules.length === 0) {
-        showLoadingSchedules();
+        scheduleGrid.innerHTML = '<div class="schedule-empty" style="grid-column: 1 / -1; text-align: center; padding: 4rem 2rem; color: var(--dark-brown); font-size: 1.2rem; font-weight: 600;">No upcoming shows scheduled. Check back soon! 🐈</div>';
         return;
     }
     
