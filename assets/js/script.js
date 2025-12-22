@@ -164,8 +164,8 @@ function renderSchedules() {
 
 // Inventory Management
 let inventory = [];
-let displayedCount = 9; // Number of items to show initially
-const itemsPerPage = 9; // Number of items to load per "Load More" click
+let currentPage = 1; // Current page number
+const itemsPerPage = 9; // Number of items per page
 
 // Load inventory from Google Sheets
 async function loadInventoryFromSheet(forceRefresh = false) {
@@ -256,10 +256,18 @@ async function loadInventoryFromSheet(forceRefresh = false) {
                     price = '$' + price;
                 }
                 
+                // Extract numeric price value for sorting (remove $ and commas, parse as float)
+                let priceValue = 0;
+                if (price) {
+                    const priceStr = price.replace(/[$,]/g, '');
+                    priceValue = parseFloat(priceStr) || 0;
+                }
+                
                 return {
                     category: (row.category || '').toLowerCase(),
                     name: row.name || '',
                     price: price,
+                    priceValue: priceValue, // Numeric value for sorting
                     image: row.image || row.imageurl || '' // Support both 'image' and 'imageurl' column names
                 };
             });
@@ -305,20 +313,20 @@ function showErrorInventory() {
     `;
 }
 
-function renderInventory(filter = 'all', searchTerm = '', resetCount = true) {
+function renderInventory(filter = 'all', searchTerm = '', resetPage = true, sortBy = 'default', priceMin = null, priceMax = null) {
     const inventoryGrid = document.getElementById('inventoryGrid');
-    const loadMoreContainer = document.getElementById('loadMoreContainer');
+    const paginationContainer = document.getElementById('paginationContainer');
     if (!inventoryGrid) return;
     
     if (inventory.length === 0) {
         showLoadingInventory();
-        if (loadMoreContainer) loadMoreContainer.style.display = 'none';
+        if (paginationContainer) paginationContainer.style.display = 'none';
         return;
     }
     
-    // Reset displayed count when filter or search changes
-    if (resetCount) {
-        displayedCount = itemsPerPage;
+    // Reset to page 1 when filter, search, sort, or price filter changes
+    if (resetPage) {
+        currentPage = 1;
     }
     
     // Apply category filter
@@ -335,14 +343,55 @@ function renderInventory(filter = 'all', searchTerm = '', resetCount = true) {
         );
     }
     
+    // Apply price filter
+    if (priceMin !== null && priceMin !== '') {
+        const min = parseFloat(priceMin);
+        if (!isNaN(min)) {
+            filtered = filtered.filter(item => item.priceValue >= min);
+        }
+    }
+    if (priceMax !== null && priceMax !== '') {
+        const max = parseFloat(priceMax);
+        if (!isNaN(max)) {
+            filtered = filtered.filter(item => item.priceValue <= max);
+        }
+    }
+    
+    // Apply sorting
+    if (sortBy !== 'default') {
+        filtered = [...filtered].sort((a, b) => {
+            switch (sortBy) {
+                case 'name-asc':
+                    return a.name.localeCompare(b.name);
+                case 'name-desc':
+                    return b.name.localeCompare(a.name);
+                case 'price-asc':
+                    return a.priceValue - b.priceValue;
+                case 'price-desc':
+                    return b.priceValue - a.priceValue;
+                default:
+                    return 0;
+            }
+        });
+    }
+    
     if (filtered.length === 0) {
         inventoryGrid.innerHTML = '<div class="inventory-empty" style="grid-column: 1 / -1; text-align: center; padding: 4rem 2rem; color: var(--gray); font-size: 1.2rem;">No items found.</div>';
-        if (loadMoreContainer) loadMoreContainer.style.display = 'none';
+        if (paginationContainer) paginationContainer.style.display = 'none';
         return;
     }
     
-    // Get items to display (pagination)
-    const itemsToShow = filtered.slice(0, displayedCount);
+    // Calculate pagination
+    const totalPages = Math.ceil(filtered.length / itemsPerPage);
+    
+    // Ensure currentPage is within valid range
+    if (currentPage > totalPages && totalPages > 0) {
+        currentPage = totalPages;
+    }
+    
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const itemsToShow = filtered.slice(startIndex, endIndex);
     
     inventoryGrid.innerHTML = itemsToShow.map(item => `
         <div class="inventory-item" data-category="${item.category}">
@@ -354,14 +403,98 @@ function renderInventory(filter = 'all', searchTerm = '', resetCount = true) {
         </div>
     `).join('');
     
-    // Show/hide "Load More" button
-    if (loadMoreContainer) {
-        if (displayedCount < filtered.length) {
-            loadMoreContainer.style.display = 'block';
-        } else {
-            loadMoreContainer.style.display = 'none';
-        }
+    // Render pagination controls
+    renderPagination(totalPages, filtered.length);
+}
+
+// Pagination rendering
+function renderPagination(totalPages, totalItems) {
+    const paginationContainer = document.getElementById('paginationContainer');
+    const paginationNumbers = document.getElementById('paginationNumbers');
+    const paginationPrev = document.getElementById('paginationPrev');
+    const paginationNext = document.getElementById('paginationNext');
+    
+    if (!paginationContainer || !paginationNumbers) return;
+    
+    // Hide pagination if only one page or no items
+    if (totalPages <= 1) {
+        paginationContainer.style.display = 'none';
+        return;
     }
+    
+    paginationContainer.style.display = 'flex';
+    
+    // Update Previous button
+    if (paginationPrev) {
+        paginationPrev.disabled = currentPage === 1;
+        paginationPrev.style.opacity = currentPage === 1 ? '0.5' : '1';
+        paginationPrev.style.cursor = currentPage === 1 ? 'not-allowed' : 'pointer';
+    }
+    
+    // Update Next button
+    if (paginationNext) {
+        paginationNext.disabled = currentPage === totalPages;
+        paginationNext.style.opacity = currentPage === totalPages ? '0.5' : '1';
+        paginationNext.style.cursor = currentPage === totalPages ? 'not-allowed' : 'pointer';
+    }
+    
+    // Generate page numbers
+    let pageNumbersHTML = '';
+    const maxVisiblePages = 7; // Show up to 7 page numbers
+    
+    if (totalPages <= maxVisiblePages) {
+        // Show all pages if total is less than max
+        for (let i = 1; i <= totalPages; i++) {
+            pageNumbersHTML += `<button class="pagination-number ${i === currentPage ? 'active' : ''}" data-page="${i}">${i}</button>`;
+        }
+    } else {
+        // Show first page
+        pageNumbersHTML += `<button class="pagination-number ${1 === currentPage ? 'active' : ''}" data-page="1">1</button>`;
+        
+        if (currentPage > 3) {
+            pageNumbersHTML += `<span class="pagination-ellipsis">...</span>`;
+        }
+        
+        // Show pages around current page
+        const startPage = Math.max(2, currentPage - 1);
+        const endPage = Math.min(totalPages - 1, currentPage + 1);
+        
+        for (let i = startPage; i <= endPage; i++) {
+            pageNumbersHTML += `<button class="pagination-number ${i === currentPage ? 'active' : ''}" data-page="${i}">${i}</button>`;
+        }
+        
+        if (currentPage < totalPages - 2) {
+            pageNumbersHTML += `<span class="pagination-ellipsis">...</span>`;
+        }
+        
+        // Show last page
+        pageNumbersHTML += `<button class="pagination-number ${totalPages === currentPage ? 'active' : ''}" data-page="${totalPages}">${totalPages}</button>`;
+    }
+    
+    paginationNumbers.innerHTML = pageNumbersHTML;
+    
+    // Add click handlers to page number buttons
+    paginationNumbers.querySelectorAll('.pagination-number').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const page = parseInt(btn.getAttribute('data-page'));
+            if (page !== currentPage) {
+                currentPage = page;
+                applyInventoryFilters(false);
+                // Scroll to top of inventory section
+                document.getElementById('inventory')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    });
+}
+
+// Helper function to get all current filter/sort/price values and render
+function applyInventoryFilters(resetPage = true) {
+    const activeFilter = document.querySelector('.filter-btn.active')?.getAttribute('data-filter') || 'all';
+    const searchTerm = document.getElementById('inventorySearch')?.value || '';
+    const sortBy = document.getElementById('sortSelect')?.value || 'default';
+    const priceMin = document.getElementById('priceMin')?.value || null;
+    const priceMax = document.getElementById('priceMax')?.value || null;
+    renderInventory(activeFilter, searchTerm, resetPage, sortBy, priceMin, priceMax);
 }
 
 // Inventory Filters (set up in DOMContentLoaded)
@@ -593,9 +726,7 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-                const filter = btn.getAttribute('data-filter');
-                const searchTerm = document.getElementById('inventorySearch')?.value || '';
-                renderInventory(filter, searchTerm, true);
+                applyInventoryFilters(true);
             });
         });
 
@@ -606,21 +737,114 @@ document.addEventListener('DOMContentLoaded', () => {
             inventorySearchInput.addEventListener('input', (e) => {
                 clearTimeout(searchTimeout);
                 searchTimeout = setTimeout(() => {
-                    const searchTerm = e.target.value;
-                    const activeFilter = document.querySelector('.filter-btn.active')?.getAttribute('data-filter') || 'all';
-                    renderInventory(activeFilter, searchTerm, true);
+                    applyInventoryFilters(true);
                 }, 300); // Debounce search by 300ms
             });
         }
 
-        // Load More Button
-        const loadMoreBtn = document.getElementById('loadMoreBtn');
-        if (loadMoreBtn) {
-            loadMoreBtn.addEventListener('click', () => {
-                displayedCount += itemsPerPage;
+        // Sort Select
+        const sortSelect = document.getElementById('sortSelect');
+        if (sortSelect) {
+            sortSelect.addEventListener('change', () => {
+                applyInventoryFilters(true);
+            });
+        }
+
+        // Price Filter Inputs
+        const priceMinInput = document.getElementById('priceMin');
+        const priceMaxInput = document.getElementById('priceMax');
+        if (priceMinInput) {
+            let priceTimeout;
+            priceMinInput.addEventListener('input', () => {
+                clearTimeout(priceTimeout);
+                priceTimeout = setTimeout(() => {
+                    applyInventoryFilters(true);
+                }, 500); // Debounce price filter by 500ms
+            });
+        }
+        if (priceMaxInput) {
+            let priceTimeout;
+            priceMaxInput.addEventListener('input', () => {
+                clearTimeout(priceTimeout);
+                priceTimeout = setTimeout(() => {
+                    applyInventoryFilters(true);
+                }, 500); // Debounce price filter by 500ms
+            });
+        }
+
+        // Pagination buttons
+        const paginationPrev = document.getElementById('paginationPrev');
+        const paginationNext = document.getElementById('paginationNext');
+        
+        if (paginationPrev) {
+            paginationPrev.addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    applyInventoryFilters(false);
+                    // Scroll to top of inventory section
+                    document.getElementById('inventory')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        }
+        
+        if (paginationNext) {
+            paginationNext.addEventListener('click', () => {
                 const activeFilter = document.querySelector('.filter-btn.active')?.getAttribute('data-filter') || 'all';
                 const searchTerm = document.getElementById('inventorySearch')?.value || '';
-                renderInventory(activeFilter, searchTerm, false);
+                const sortBy = document.getElementById('sortSelect')?.value || 'default';
+                const priceMin = document.getElementById('priceMin')?.value || null;
+                const priceMax = document.getElementById('priceMax')?.value || null;
+                
+                // Get filtered and sorted items to check total pages
+                let filtered = activeFilter === 'all' 
+                    ? inventory 
+                    : inventory.filter(item => item.category === activeFilter);
+                
+                if (searchTerm) {
+                    const searchLower = searchTerm.toLowerCase();
+                    filtered = filtered.filter(item => 
+                        item.name.toLowerCase().includes(searchLower) ||
+                        item.price.toLowerCase().includes(searchLower)
+                    );
+                }
+                
+                if (priceMin !== null && priceMin !== '') {
+                    const min = parseFloat(priceMin);
+                    if (!isNaN(min)) {
+                        filtered = filtered.filter(item => item.priceValue >= min);
+                    }
+                }
+                if (priceMax !== null && priceMax !== '') {
+                    const max = parseFloat(priceMax);
+                    if (!isNaN(max)) {
+                        filtered = filtered.filter(item => item.priceValue <= max);
+                    }
+                }
+                
+                if (sortBy !== 'default') {
+                    filtered = [...filtered].sort((a, b) => {
+                        switch (sortBy) {
+                            case 'name-asc':
+                                return a.name.localeCompare(b.name);
+                            case 'name-desc':
+                                return b.name.localeCompare(a.name);
+                            case 'price-asc':
+                                return a.priceValue - b.priceValue;
+                            case 'price-desc':
+                                return b.priceValue - a.priceValue;
+                            default:
+                                return 0;
+                        }
+                    });
+                }
+                
+                const totalPages = Math.ceil(filtered.length / itemsPerPage);
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    applyInventoryFilters(false);
+                    // Scroll to top of inventory section
+                    document.getElementById('inventory')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
             });
         }
     }, 100);

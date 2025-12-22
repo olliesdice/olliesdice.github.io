@@ -564,12 +564,123 @@ body::before {
     transform: translateY(-2px);
 }
 
+.inventory-controls {
+    margin-bottom: 4rem;
+}
+
 .inventory-filters {
     display: flex;
     justify-content: center;
     gap: 1.2rem;
-    margin-bottom: 4rem;
+    margin-bottom: 2rem;
     flex-wrap: wrap;
+}
+
+.inventory-sort-filter-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+}
+
+.sort-container {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.sort-label {
+    font-weight: 700;
+    color: var(--dark-brown);
+    font-size: 1rem;
+    font-family: 'Comfortaa', cursive;
+}
+
+.sort-select {
+    padding: 10px 20px;
+    background: var(--white);
+    border: 3px solid var(--beige);
+    border-radius: 20px;
+    color: var(--dark-brown);
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 0 var(--beige);
+    font-family: 'Comfortaa', cursive;
+    min-width: 180px;
+}
+
+.sort-select:hover {
+    background: var(--lavender);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 0 var(--beige);
+}
+
+.sort-select:focus {
+    outline: none;
+    background: var(--lavender);
+    border-color: var(--blue);
+    box-shadow: 0 5px 0 var(--beige), 0 0 0 3px rgba(138, 180, 248, 0.3);
+}
+
+.price-filter-container {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.price-filter-label {
+    font-weight: 700;
+    color: var(--dark-brown);
+    font-size: 1rem;
+    font-family: 'Comfortaa', cursive;
+}
+
+.price-input {
+    padding: 10px 15px;
+    background: var(--white);
+    border: 3px solid var(--beige);
+    border-radius: 20px;
+    color: var(--dark-brown);
+    font-weight: 600;
+    font-size: 0.95rem;
+    width: 100px;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 0 var(--beige);
+    font-family: 'Comfortaa', cursive;
+    /* Hide spinner arrows */
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.price-input::-webkit-outer-spin-button,
+.price-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.price-input:hover {
+    background: var(--lavender);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 0 var(--beige);
+}
+
+.price-input:focus {
+    outline: none;
+    background: var(--lavender);
+    border-color: var(--blue);
+    box-shadow: 0 5px 0 var(--beige), 0 0 0 3px rgba(138, 180, 248, 0.3);
+}
+
+.price-separator {
+    font-weight: 700;
+    color: var(--dark-brown);
+    font-size: 1.1rem;
+    user-select: none;
 }
 
 .filter-btn {
@@ -675,34 +786,190 @@ body::before {
     font-size: 0.95rem;
 }
 
-/* Load More Button */
-.load-more-container {
-    text-align: center;
+/* Pagination */
+.pagination-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
     margin-top: 3rem;
+    flex-wrap: wrap;
 }
 
-.load-more-btn {
-    padding: 15px 40px;
+.pagination-btn {
+    padding: 12px 24px;
     background: var(--lavender);
     color: var(--dark-brown);
     border: 4px solid var(--beige);
-    border-radius: 30px;
+    border-radius: 25px;
     font-weight: 700;
-    font-size: 1.1rem;
+    font-size: 1rem;
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 
         0 4px 0 var(--beige),
         0 8px 15px rgba(74, 55, 40, 0.2);
     transform: rotate(-0.5deg);
+    font-family: 'Comfortaa', cursive;
 }
 
-.load-more-btn:hover {
+.pagination-btn:hover:not(:disabled) {
     background: var(--blue);
     transform: translateY(-2px) rotate(0deg);
     box-shadow: 
         0 6px 0 var(--beige),
         0 10px 20px rgba(74, 55, 40, 0.3);
+}
+
+.pagination-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.pagination-numbers {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.pagination-number {
+    min-width: 45px;
+    height: 45px;
+    padding: 0;
+    background: var(--white);
+    color: var(--dark-brown);
+    border: 3px solid var(--beige);
+    border-radius: 15px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 
+        0 3px 0 var(--beige),
+        0 6px 12px rgba(74, 55, 40, 0.15);
+    font-family: 'Comfortaa', cursive;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pagination-number:hover {
+    background: var(--lavender);
+    transform: translateY(-2px);
+    box-shadow: 
+        0 5px 0 var(--beige),
+        0 8px 15px rgba(74, 55, 40, 0.25);
+}
+
+.pagination-number.active {
+    background: var(--blue);
+    color: var(--white);
+    border-color: var(--dark-brown);
+    transform: scale(1.1);
+    box-shadow: 
+        0 5px 0 var(--dark-brown),
+        0 10px 20px rgba(74, 55, 40, 0.3);
+}
+
+.pagination-ellipsis {
+    padding: 0 0.5rem;
+    color: var(--dark-brown);
+    font-weight: 700;
+    font-size: 1.2rem;
+    user-select: none;
+}
+
+/* Responsive Pagination */
+@media (max-width: 768px) {
+    .pagination-container {
+        gap: 0.75rem;
+        margin-top: 2rem;
+    }
+    
+    .pagination-btn {
+        padding: 10px 18px;
+        font-size: 0.9rem;
+    }
+    
+    .pagination-number {
+        min-width: 40px;
+        height: 40px;
+        font-size: 0.9rem;
+    }
+    
+    .inventory-sort-filter-row {
+        flex-direction: column;
+        gap: 1.5rem;
+        align-items: stretch;
+    }
+    
+    .sort-container,
+    .price-filter-container {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .sort-select {
+        min-width: 200px;
+    }
+    
+    .price-input {
+        width: 90px;
+    }
+}
+
+@media (max-width: 480px) {
+    .pagination-container {
+        gap: 0.5rem;
+        margin-top: 2rem;
+    }
+    
+    .pagination-btn {
+        padding: 8px 14px;
+        font-size: 0.85rem;
+    }
+    
+    .pagination-numbers {
+        gap: 0.35rem;
+    }
+    
+    .pagination-number {
+        min-width: 36px;
+        height: 36px;
+        font-size: 0.85rem;
+    }
+    
+    .pagination-ellipsis {
+        font-size: 1rem;
+        padding: 0 0.25rem;
+    }
+    
+    .inventory-sort-filter-row {
+        gap: 1.2rem;
+    }
+    
+    .sort-container,
+    .price-filter-container {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .sort-label,
+    .price-filter-label {
+        font-size: 0.9rem;
+    }
+    
+    .sort-select {
+        min-width: 100%;
+        max-width: 250px;
+    }
+    
+    .price-input {
+        width: 80px;
+    }
 }
 
 /* Instagram Section */
