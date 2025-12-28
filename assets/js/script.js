@@ -516,8 +516,6 @@ function renderPagination(totalPages, totalItems) {
             if (page !== currentPage) {
                 currentPage = page;
                 applyInventoryFilters(false);
-                // Scroll to top of inventory section
-                document.getElementById('inventory')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         });
     });
@@ -817,8 +815,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (currentPage > 1) {
                     currentPage--;
                     applyInventoryFilters(false);
-                    // Scroll to top of inventory section
-                    document.getElementById('inventory')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
             });
         }
@@ -878,8 +874,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (currentPage < totalPages) {
                     currentPage++;
                     applyInventoryFilters(false);
-                    // Scroll to top of inventory section
-                    document.getElementById('inventory')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
             });
         }
