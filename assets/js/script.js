@@ -300,7 +300,7 @@ async function loadInventoryFromSheet(forceRefresh = false) {
                 }
                 
                 return {
-                    category: (row.category || '').toLowerCase(),
+                    category: String(row.category || '').toLowerCase(),
                     name: row.name || '',
                     price: price,
                     priceValue: priceValue, // Numeric value for sorting
